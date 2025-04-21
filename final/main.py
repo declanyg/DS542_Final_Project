@@ -14,6 +14,36 @@ class DefaultTemplate(Scene):
         self.play(Transform(square, circle))  # interpolate the square into the circle
         self.play(FadeOut(square))  # fade out animation
 
+class Gridworld(Scene):
+    def construct(self):
+        grid_size = 5
+        square_size = 1
+
+        def grid_to_pos(x, y):
+            return LEFT * (grid_size / 2 - 0.5 - x) * square_size + DOWN * (grid_size / 2 - 0.5 - y) * square_size
+        
+        for i in range(grid_size):
+            for j in range(grid_size):
+                square = Square(side_length=square_size).move_to(grid_to_pos(i, j))
+                self.add(square)
+        
+
+        start_cell = Square(side_length=square_size).move_to(grid_to_pos(0, 0)).set_fill(GREEN, 0.5)
+        goal_cell = Square(side_length=square_size).move_to(grid_to_pos(4, 4)).set_fill(BLUE, 0.5)
+        lava_cells = [(1, 2), (3, 1)]
+        lava_squares = [Square(side_length=square_size).move_to(grid_to_pos(x, y)).set_fill(RED, 0.5) for x, y in lava_cells]
+
+        self.add(start_cell, goal_cell, *lava_squares)
+
+        agent = Circle(radius=0.2, color=WHITE, fill_opacity=1).move_to(grid_to_pos(0, 0))
+        self.add(agent)
+
+        path = [(0, 0), (1, 0), (2, 0), (2, 1), (2, 2), (3, 2), (4, 2), (4, 3), (4, 4)]
+
+        for coord in path[1:]:
+            self.play(agent.animate.move_to(grid_to_pos(*coord)), run_time=0.5)
+
+        self.wait(1)
 
 class GradientDescentGraph(Scene):
     def construct(self):
