@@ -81,3 +81,34 @@ class GradientDescentGraph(Scene):
         self.wait(5)
 
         self.play(ball_x.animate.set_value(-0.65322), run_time=4, rate_func=linear)
+
+class GRPO(Scene):
+    def construct(self):
+        title = Text("GRPO (Group Relative Policy Optimization)", font_size=24).to_edge(UP)
+        self.play(Write(title))
+        
+        # Main Equation
+        equation = MathTex(
+            r"J_{\text{GRPO}}(\theta) = \mathbb{E}_{q \sim P(Q), \{o_i\}_{i=1}^G \sim \pi_{\theta_{\text{old}}}(O \mid q)} \left[",
+            r"\frac{1}{G} \sum_{i=1}^G \min \left(",
+            r"\frac{\pi_\theta(o_i \mid q)}{\pi_{\theta_{\text{old}}}(o_i \mid q)} A_i,",
+            r"\text{clip} \left(",
+            r"\frac{\pi_\theta(o_i \mid q)}{\pi_{\theta_{\text{old}}}(o_i \mid q)},",
+            r"1 - \epsilon, 1 + \epsilon",
+            r"\right) A_i",
+            r"\right)",
+            r"- \beta D_{KL}(\pi_\theta \| \pi_{\text{ref}})",
+            r"\right]"
+        ).scale(0.5)
+
+        # Animate equation
+        self.play(Write(equation[0]))  # Expectation
+        self.wait(0.5)
+        self.play(Write(equation[1]))  # Left bracket
+        self.play(Write(equation[2]))  # Group average
+        self.play(Write(equation[3]))  # min(
+        self.play(Write(equation[4]))  # Policy ratio * advantage
+        self.play(Write(equation[5]))  # Clipped term
+        self.play(Write(equation[6]))  # )
+        self.play(Write(equation[7]))  # KL penalty
+        self.play(Write(equation[8]))  # Right bracket
