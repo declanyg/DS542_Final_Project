@@ -35,13 +35,46 @@ class Gridworld(Scene):
 
         self.add(start_cell, goal_cell, *lava_squares)
 
+        coin_positions = [(0, 4), (2, 1), (3, 2), (4, 2), (1, 3)]
+        coins = {}
+
+        for coord in coin_positions:
+            coin = Circle(radius=0.2, color=GOLD_E, fill_opacity=1).move_to(grid_to_pos(*coord))
+            self.add(coin)
+            coins[coord] = coin
+
         agent = Circle(radius=0.2, color=WHITE, fill_opacity=1).move_to(grid_to_pos(0, 0))
         self.add(agent)
+
+        self.wait(4)
+        highlight = Square(side_length=square_size + 0.1, color=YELLOW).move_to(grid_to_pos(4, 4))
+        self.add(highlight)
+        self.play(Create(highlight))
+        self.play(FadeOut(highlight))
+
+        lava_highlights = [
+            Square(side_length=square_size + 0.1, color=YELLOW).move_to(grid_to_pos(x, y))
+            for x, y in lava_cells
+        ]
+        self.add(*lava_highlights)
+        self.play(*[Create(highlight) for highlight in lava_highlights])
+        self.play(*[FadeOut(highlight) for highlight in lava_highlights])
+
+        coin_highlights = [
+            Square(side_length=square_size + 0.1, color=YELLOW).move_to(grid_to_pos(x, y))
+            for x, y in coin_positions
+        ]
+        self.add(*coin_highlights)
+        self.play(*[Create(highlight) for highlight in coin_highlights])
+        self.play(*[FadeOut(highlight) for highlight in coin_highlights])
 
         path = [(0, 0), (1, 0), (2, 0), (2, 1), (2, 2), (3, 2), (4, 2), (4, 3), (4, 4)]
 
         for coord in path[1:]:
             self.play(agent.animate.move_to(grid_to_pos(*coord)), run_time=0.5)
+            if coord in coins:
+                self.remove(coins[coord])
+                del coins[coord]
 
         self.wait(1)
 
