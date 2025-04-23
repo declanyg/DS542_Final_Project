@@ -82,6 +82,45 @@ class GradientDescentGraph(Scene):
 
         self.play(ball_x.animate.set_value(-0.65322), run_time=4, rate_func=linear)
 
+class GRPOText(Scene):
+    def construct(self):
+        title = Text("GRPO (Group Relative Policy Optimization)", font_size=48)
+        self.play(Write(title))
+
+class ReinforcementLearningText(Scene):
+    def construct(self):
+        rl_text = Text("Reinforcement Learning", font_size=48)
+        self.play(Write(rl_text))
+
+        self.wait(2)
+
+        ml_text = Text("Machine Learning", font_size=48)
+        ml_text.to_edge(UP)
+        self.play(Write(ml_text))
+        self.wait(1)
+
+        rl_text_target = rl_text.copy().scale(0.8)
+        rl_text_target.to_edge(RIGHT).shift(DOWN * 0.5)
+
+        self.play(Transform(rl_text, rl_text_target))
+
+        ml_box = SurroundingRectangle(ml_text, color=BLUE, corner_radius=0.2)
+        rl_box = SurroundingRectangle(rl_text, color=BLUE, corner_radius=0.2)
+        self.play(Create(ml_box), Create(rl_box))
+
+        branch_rl = Arrow(ml_box.get_bottom(), rl_box.get_top())
+        self.play(Create(branch_rl))
+        self.wait()
+
+        sl_text = Text("Supervised Learning...", font_size=48).scale(0.8)
+        sl_text.to_edge(LEFT).shift(DOWN * 0.5)
+
+        sl_box = SurroundingRectangle(sl_text, color=BLUE, corner_radius=0.2)
+        self.play(Write(sl_text), Create(sl_box))
+        branch_sl = Arrow(ml_box.get_bottom(), sl_box.get_top())
+        self.play(Create(branch_sl))
+        
+
 class GRPO(Scene):
     def construct(self):
         title = Text("GRPO (Group Relative Policy Optimization)", font_size=24).to_edge(UP)
