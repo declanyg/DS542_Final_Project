@@ -78,6 +78,190 @@ class Gridworld(Scene):
 
         self.wait(1)
 
+class ReinforcementLearningConcepts(Scene):
+    def construct(self):
+        title = Text("Reinforcement Learning Concepts", font_size=48)
+        title.to_edge(UP)
+        self.play(Write(title))
+        self.wait(1)
+        # Create a list of concepts
+        concepts = ["- Agent", "- Environment", "- Rewards", "- Policy"]
+
+        list_text = VGroup(*[
+            Text(concept, font_size=36) for concept in concepts
+        ]).arrange(DOWN, aligned_edge=LEFT, buff=0.3)
+
+        self.play(LaggedStart(*[Write(t) for t in list_text], lag_ratio=0.8))
+        self.wait(2)
+
+class GridworldConceptsDemo(Scene):
+    def construct(self):
+        grid_size = 5
+        square_size = 1
+
+        def grid_to_pos(x, y):
+            return LEFT * (grid_size / 2 - 0.5 - x) * square_size + DOWN * (grid_size / 2 - 0.5 - y) * square_size
+        
+        for i in range(grid_size):
+            for j in range(grid_size):
+                square = Square(side_length=square_size).move_to(grid_to_pos(i, j))
+                self.add(square)
+        
+
+        start_cell = Square(side_length=square_size).move_to(grid_to_pos(0, 0)).set_fill(GREEN, 0.5)
+        goal_cell = Square(side_length=square_size).move_to(grid_to_pos(4, 4)).set_fill(BLUE, 0.5)
+        lava_cells = [(1, 2), (3, 1)]
+        lava_squares = [Square(side_length=square_size).move_to(grid_to_pos(x, y)).set_fill(RED, 0.5) for x, y in lava_cells]
+
+        self.add(start_cell, goal_cell, *lava_squares)
+
+        coin_positions = [(0, 4), (2, 1), (3, 2), (4, 2), (1, 3)]
+        coins = {}
+
+        for coord in coin_positions:
+            coin = Circle(radius=0.2, color=GOLD_E, fill_opacity=1).move_to(grid_to_pos(*coord))
+            self.add(coin)
+            coins[coord] = coin
+
+        agent = Circle(radius=0.2, color=WHITE, fill_opacity=1).move_to(grid_to_pos(0, 0))
+        self.add(agent)
+
+        self.wait(1)
+        highlight = Square(side_length=square_size + 0.1, color=YELLOW).move_to(grid_to_pos(0, 0))
+        self.add(highlight)
+        self.play(Create(highlight))
+        self.play(FadeOut(highlight))
+
+        self.wait(1)
+        highlight = Square(side_length=grid_size + 0.1, color=YELLOW)
+        self.add(highlight)
+        self.play(Create(highlight))
+        self.play(FadeOut(highlight))
+
+        self.wait(2)
+        arrow_len = 0.4
+        agent_pos = grid_to_pos(0, 0)
+        arrows = VGroup(
+            Arrow(agent_pos + UP * 0.5, agent_pos + UP * (0.5 + arrow_len), buff=0, color=YELLOW, stroke_width=8),
+            Arrow(agent_pos + DOWN * 0.5, agent_pos + DOWN * (0.5 + arrow_len), buff=0, color=YELLOW, stroke_width=8),
+            Arrow(agent_pos + LEFT * 0.5, agent_pos + LEFT * (0.5 + arrow_len), buff=0, color=YELLOW, stroke_width=8),
+            Arrow(agent_pos + RIGHT * 0.5, agent_pos + RIGHT * (0.5 + arrow_len), buff=0, color=YELLOW, stroke_width=8)
+        )
+
+        self.play(LaggedStart(*[Create(arrow) for arrow in arrows], lag_ratio=0.3))
+        self.play(LaggedStart(*[FadeOut(arrow) for arrow in arrows], lag_ratio=0.0))
+
+        path = [(0, 0), (1, 0), (2, 0), (2, 1), (2, 2), (3, 2), (4, 2), (4, 3), (4, 4)]
+
+        for i in range(1, len(path)):
+            prev_coord = path[i - 1]
+            curr_coord = path[i]
+
+            start = grid_to_pos(*prev_coord)
+            end = grid_to_pos(*curr_coord)
+            arrow = Arrow(start, end, buff=0.1, color=YELLOW, stroke_width=6)
+            self.play(Create(arrow))
+            self.play(FadeOut(arrow))
+            self.play(agent.animate.move_to(end))
+
+            if curr_coord in coins:
+                self.remove(coins[curr_coord])
+                score_text = Text("+0.1", font_size=36, color=GREEN).move_to(end+ UP)
+                self.play(Write(score_text))
+                self.play(FadeOut(score_text))
+                del coins[curr_coord]
+            
+            if curr_coord == (4, 4):
+                score_text = Text("+1", font_size=36, color=GREEN).move_to(grid_to_pos(4, 4)+ UP)
+                self.play(Write(score_text))
+                self.play(FadeOut(score_text))
+        
+        # self.camera.frame.save_state()
+        # self.play(self.camera.frame.animate.shift(RIGHT * 3))
+        
+        # text_on_right = Text("Reward", font_size=36).shift(RIGHT * 4)  # Position it on the right side
+        # self.play(Write(text_on_right))
+
+        # self.play(Restore(self.camera.frame))
+
+class GridworldPolicyDemo(Scene):
+    def construct(self):
+        grid_size = 5
+        square_size = 1
+
+        def grid_to_pos(x, y):
+            return LEFT * (grid_size / 2 - 0.5 - x) * square_size + DOWN * (grid_size / 2 - 0.5 - y) * square_size
+        
+        for i in range(grid_size):
+            for j in range(grid_size):
+                square = Square(side_length=square_size).move_to(grid_to_pos(i, j))
+                self.add(square)
+        
+
+        start_cell = Square(side_length=square_size).move_to(grid_to_pos(0, 0)).set_fill(GREEN, 0.5)
+        goal_cell = Square(side_length=square_size).move_to(grid_to_pos(4, 4)).set_fill(BLUE, 0.5)
+        lava_cells = [(1, 2), (3, 1)]
+        lava_squares = [Square(side_length=square_size).move_to(grid_to_pos(x, y)).set_fill(RED, 0.5) for x, y in lava_cells]
+
+        self.add(start_cell, goal_cell, *lava_squares)
+
+        coin_positions = [(0, 4), (2, 1), (4, 2), (1, 3)]
+        coins = {}
+
+        for coord in coin_positions:
+            coin = Circle(radius=0.2, color=GOLD_E, fill_opacity=1).move_to(grid_to_pos(*coord))
+            self.add(coin)
+            coins[coord] = coin
+
+        agent = Circle(radius=0.2, color=WHITE, fill_opacity=1).move_to(grid_to_pos(3, 2))
+        self.add(agent)
+
+        self.wait(12)
+
+        agent_pos = grid_to_pos(3, 2)
+        arrow_len = 0.4
+        arrows = VGroup(
+            Arrow(agent_pos + UP * 0.5, agent_pos + UP * (0.5 + arrow_len), buff=0, color=GREEN, stroke_width=8),
+            Arrow(agent_pos + LEFT * 0.5, agent_pos + LEFT * (0.5 + arrow_len), buff=0, color=GREEN, stroke_width=8),
+            Arrow(agent_pos + RIGHT * 0.5, agent_pos + RIGHT * (0.5 + arrow_len), buff=0, color=GREEN, stroke_width=8)
+        )
+
+        self.play(LaggedStart(*[Create(arrow) for arrow in arrows], lag_ratio=0.3))
+        self.play(LaggedStart(*[FadeOut(arrow) for arrow in arrows], lag_ratio=0.0))
+
+        self.wait(1)
+
+        self.play(agent.animate.move_to(grid_to_pos(3,1)))
+        self.play(agent.animate.set_fill(RED).set_stroke(RED, width=2))
+        score_text = Text("-1", font_size=36, color=RED).move_to(grid_to_pos(3,1)+ UP)
+        self.play(Write(score_text))
+        self.play(FadeOut(score_text))
+        self.wait(1)
+        self.play(agent.animate.move_to(grid_to_pos(0,0)).set_fill(WHITE).set_stroke(WHITE, width=2))
+
+        path = [(0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (1, 4), (2, 4), (3, 4), (4, 4)]
+
+        for i in range(1, len(path)):
+            prev_coord = path[i - 1]
+            curr_coord = path[i]
+
+            end = grid_to_pos(*curr_coord)
+            self.play(agent.animate.move_to(end))
+
+            if curr_coord in coins:
+                self.remove(coins[curr_coord])
+                score_text = Text("+0.1", font_size=36, color=GREEN).move_to(end+ UP)
+                self.play(Write(score_text))
+                self.play(FadeOut(score_text))
+                del coins[curr_coord]
+            
+            if curr_coord == (4, 4):
+                score_text = Text("+1", font_size=36, color=GREEN).move_to(grid_to_pos(4, 4)+ UP)
+                self.play(Write(score_text))
+                self.play(FadeOut(score_text))
+
+
+
 class GradientDescentGraph(Scene):
     def construct(self):
         graph_func = lambda x: math.sin(2*x)+0.4*x**2
@@ -120,7 +304,7 @@ class GRPOText(Scene):
         title = Text("GRPO (Group Relative Policy Optimization)", font_size=48)
         self.play(Write(title))
 
-class ReinforcementLearningText(Scene):
+class ReinforcementLearningIntro(Scene):
     def construct(self):
         rl_text = Text("Reinforcement Learning", font_size=48)
         self.play(Write(rl_text))
