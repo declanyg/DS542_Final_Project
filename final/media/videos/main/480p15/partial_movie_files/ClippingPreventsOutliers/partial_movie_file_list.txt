@@ -1,0 +1,12 @@
+# This file is used internally by FFMPEG.
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/ClippingPreventsOutliers/1185818338_1822051299_223132457.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/ClippingPreventsOutliers/624642324_2827368671_2779997219.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/ClippingPreventsOutliers/624642324_2522506818_1988587440.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/ClippingPreventsOutliers/624642324_771850101_1627462131.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/ClippingPreventsOutliers/624642324_1135933408_3735114898.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/ClippingPreventsOutliers/624642324_1601438133_2528060881.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/ClippingPreventsOutliers/624642324_3794031945_1836677914.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/ClippingPreventsOutliers/624642324_2958467882_2650658230.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/ClippingPreventsOutliers/624642324_1432596116_653501625.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/ClippingPreventsOutliers/624642324_2594308484_554602333.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/ClippingPreventsOutliers/624642324_2872842549_793722953.mp4'

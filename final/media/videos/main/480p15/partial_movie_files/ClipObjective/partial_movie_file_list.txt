@@ -1,0 +1,9 @@
+# This file is used internally by FFMPEG.
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/ClipObjective/1185818338_2267044165_223132457.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/ClipObjective/624642324_3442631783_2779997219.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/ClipObjective/624642324_3403659329_2798608283.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/ClipObjective/624642324_1382313222_2573592025.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/ClipObjective/624642324_2943926353_629563809.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/ClipObjective/624642324_2872842549_987653515.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/ClipObjective/624642324_861347863_3610164044.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/ClipObjective/624642324_4277570474_2032765592.mp4'

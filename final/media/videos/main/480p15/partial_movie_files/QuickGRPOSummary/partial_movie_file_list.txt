@@ -1,0 +1,10 @@
+# This file is used internally by FFMPEG.
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/QuickGRPOSummary/1185818338_366564817_1832953836.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/QuickGRPOSummary/624642324_3127842634_2450717638.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/QuickGRPOSummary/624642324_95173422_3956573725.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/QuickGRPOSummary/624642324_1197065818_2202086364.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/QuickGRPOSummary/624642324_7257769_1526931654.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/QuickGRPOSummary/624642324_95173422_1736424779.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/QuickGRPOSummary/624642324_3718206882_2857414357.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/QuickGRPOSummary/624642324_3720290610_1907980924.mp4'
+file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/QuickGRPOSummary/624642324_2872842549_3938745802.mp4'
