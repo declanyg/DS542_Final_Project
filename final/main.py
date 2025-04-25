@@ -1,5 +1,6 @@
 from manim import *
 import math
+import numpy as np
 
 class DefaultTemplate(Scene):
     def construct(self):
@@ -483,13 +484,13 @@ class GRPO(Scene):
         ).scale(0.5)
 
         # Animate equation
-        self.play(Write(equation), runtime=1)
+        self.play(Write(equation))
 
         self.play(equation.animate.shift(UP * 1.5))
 
         #Transforming the q into question 
         original_q = equation[7].copy()
-        self.play(equation[7].animate.move_to(ORIGIN).scale(1.75), runtime=0.25)
+        self.play(equation[7].animate.move_to(ORIGIN).scale(1.75))
         self.play(Transform(equation[7], Text("question", font_size=24, color=WHITE)))
         self.wait(7)
         self.play(Transform(equation[7], Text("What is Deepseek?", font_size=24, color=WHITE)))
@@ -497,7 +498,7 @@ class GRPO(Scene):
 
         #Transforming the o_i into output 
         original_oi = equation[5].copy()
-        self.play(equation[5].animate.move_to(ORIGIN).scale(1.75), runtime=0.25)
+        self.play(equation[5].animate.move_to(ORIGIN).scale(1.75))
         self.play(Transform(equation[5], Text("output", font_size=24, color=WHITE)))
         self.wait(1)
         #Highlight old policy
@@ -893,3 +894,534 @@ class QuickGRPOSummary(Scene):
         self.play(FadeOut(summary3))
         
         self.wait(3)
+
+class GRPOExample(Scene):
+    def construct(self):
+        title = Text("GRPO (Group Relative Policy Optimization)", font_size=24).to_edge(UP)
+        self.add(title)
+
+        # Main Equation
+        equation = MathTex(
+            r"J_{\text{GRPO}}(\theta) = ",
+            r"\mathbb{E}_{",
+            r"q \sim P(Q)",             # index 2
+            r",\; ",                    # index 3
+            r"\{o_i\}_{i=1}^G",         # index 4
+            r"\sim \pi_{\theta_{\text{old}}}(O \mid q)}",  # index 5
+            r"\left[",
+            r"\frac{1}{G} \sum_{i=1}^G \min \left(",
+            r"\frac{\pi_\theta(o_i \mid q)}{\pi_{\theta_{\text{old}}}(o_i \mid q)} A_i,",
+            r"\text{clip} \left(",
+            r"\frac{\pi_\theta(o_i \mid q)}{\pi_{\theta_{\text{old}}}(o_i \mid q)},",
+            r"1 - \epsilon,\; 1 + \epsilon",
+            r"\right) A_i",
+            r"\right)",
+            r"- \beta D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
+            r"\right]"
+        ).scale(0.5)
+        self.add(equation.shift(UP * 1.5))
+
+        #Question sampled from P(Q)
+        copy_pq = equation[2].copy()
+        self.play(copy_pq.animate.move_to(ORIGIN).scale(1.75))
+        self.play(Transform(copy_pq, Text("What colour are bananas?", font_size=24, color=WHITE)))
+        self.wait(1)
+        self.play(copy_pq.animate.next_to(equation, DOWN *1.5).shift(LEFT * 4))
+        self.wait(1)
+
+        #Probability distribution creation and sampling
+        probs = [0.4, 0.3, 0.2, 0.1]
+        colours = ["Yellow", "Green", "Brown", "Black"]
+        def get_reward_pie_chart(probs, radius=2):
+            colors = [YELLOW, GREEN, DARK_BROWN, BLACK]
+
+            start_angle = 0
+            sectors = VGroup()
+            label_group = VGroup()
+
+            for prob, color in zip(probs, colors):
+                angle = TAU * prob
+                sector = AnnularSector(
+                    inner_radius=0,
+                    outer_radius=radius,
+                    start_angle=start_angle,
+                    angle=angle,
+                    fill_color=color,
+                    fill_opacity=0.8,
+                    stroke_color=WHITE,
+                    stroke_width=1
+                )
+
+                # Label placement inside the sector
+                mid_angle = start_angle + angle / 2
+                label_pos = radius * 0.5 * np.array([np.cos(mid_angle), np.sin(mid_angle), 0])
+                txt = Text(str(prob), font_size=24, color=WHITE).move_to(label_pos)
+                sector.add(txt)  # Add label directly onto the sector
+
+                sectors.add(sector)
+                start_angle += angle
+
+            return VGroup(sectors, label_group)
+
+        pie = get_reward_pie_chart(probs).scale(0.5)
+        self.play(FadeIn(pie.shift(DOWN)))
+        self.wait(1)
+        self.play(pie.animate.shift(LEFT))
+        self.wait(1)
+        prob_texts = VGroup()  # Group for all probability texts
+        for i, (prob, colour) in enumerate(zip(probs, colours)):
+            prob_text = MathTex(
+                rf"\pi_{{\theta_{{\text{{old}}}}}}(\text{{{colour}}}) = {prob:.2f}",
+                font_size=24
+            ).shift(DOWN * i * 0.5)
+            prob_texts.add(prob_text)
+
+        prob_texts.next_to(pie, RIGHT, buff=0.5)
+
+        for text in prob_texts:
+            self.play(Write(text), run_time=0.5)
+
+        self.wait(1)
+
+        old_policy_group = VGroup(pie, prob_texts)
+        self.play(old_policy_group.animate.next_to(copy_pq, DOWN))
+
+        #Rewards
+        rewards = [1, 0.3, 0.1, -0.5]
+        colours = ["Yellow", "Green", "Brown", "Black"]
+        reward_texts = VGroup()  # Group for all reward texts
+
+        for reward, colour in zip(rewards, colours):
+            # Pad positive rewards with \phantom{-} so = signs align
+            reward_str = f"{reward}" if reward < 0 else f"\\phantom{{-}}{reward}"
+            text = MathTex(
+                rf"r(\text{{{colour}}}) = {reward_str}",
+                font_size=24
+            )
+            reward_texts.add(text)
+
+        reward_header = Text("Rewards", font_size=28).next_to(reward_texts, UP, buff=0.2)
+        reward_texts.arrange(DOWN, aligned_edge=LEFT, buff=0.1)
+        reward_group = VGroup(reward_header, reward_texts).arrange(DOWN, aligned_edge=LEFT)
+
+        self.play(FadeIn(reward_group.shift(DOWN*0.5)))
+        self.wait(1)
+
+        self.play(reward_group.animate.next_to(equation, DOWN *1.5).shift(RIGHT * 5))
+
+        #Sampling 3 different outputs
+        self.play(Transform(equation, MathTex(
+            r"J_{\text{GRPO}}(\theta) = ",
+            r"\mathbb{E}_{",
+            r"q \sim P(Q)",             # index 2
+            r",\; ",                    # index 3
+            r"\{o_i\}_{i=1}^3",         # index 4
+            r"\sim \pi_{\theta_{\text{old}}}(O \mid q)}",  # index 5
+            r"\left[",
+            r"\frac{1}{3} \sum_{i=1}^3 ",
+            r"\min \left(\frac{\pi_\theta(o_i \mid q)}{\pi_{\theta_{\text{old}}}(o_i \mid q)} A_i,",
+            r"\text{clip} \left(",
+            r"\frac{\pi_\theta(o_i \mid q)}{\pi_{\theta_{\text{old}}}(o_i \mid q)},",
+            r"1 - \epsilon,\; 1 + \epsilon",
+            r"\right) A_i",
+            r"\right)",
+            r"- \beta D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
+            r"\right]"
+        ).scale(0.5).shift(UP * 1.5)))
+
+        copy_sample_group = equation[4].copy()
+        self.play(copy_sample_group.animate.move_to(ORIGIN).scale(1.75))
+        self.play(Transform(copy_sample_group, MathTex(r"\{{o_1,o_2,o_3}\}", font_size=24, color=WHITE)))
+        self.wait(1)
+        self.play(Transform(copy_sample_group, MathTex(r"\{\text{Y},\text{Y},\text{G}\}", font_size=24, color=WHITE)))
+        self.wait(1)
+
+        obs_lines = VGroup(
+            MathTex(r"o_1 = \text{Yellow}", font_size=24),
+            MathTex(r"o_2 = \text{Yellow}", font_size=24),
+            MathTex(r"o_3 = \text{Green}", font_size=24),
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.3)
+
+        obs_lines.next_to(copy_sample_group, DOWN, buff=0.5)
+
+        self.play(Write(obs_lines))
+        self.wait(1)
+
+        self.play(Uncreate(obs_lines))
+        self.wait(0.5)
+        self.play(Transform(copy_sample_group, MathTex(r"G=\{\text{Y},\text{Y},\text{G}\}", font_size=24, color=WHITE)))
+        self.play(copy_sample_group.animate.next_to(reward_group, DOWN))
+        self.wait(1)
+
+        #New policy
+        new_probs = [0.45, 0.28, 0.18, 0.09]
+
+        new_pie = get_reward_pie_chart(new_probs).scale(0.5)
+        self.play(FadeIn(new_pie.shift(DOWN)))
+        self.wait(1)
+        self.play(new_pie.animate.shift(LEFT*0.5))
+        self.wait(1)
+        new_prob_texts = VGroup()  # Group for all probability texts
+        for i, (prob, colour) in enumerate(zip(new_probs, colours)):
+            prob_text = MathTex(
+                rf"\pi_{{\theta}}(\text{{{colour}}}) = {prob:.2f}",
+                font_size=24
+            ).shift(DOWN * i * 0.5+RIGHT*0.5)
+            new_prob_texts.add(prob_text)
+
+        new_prob_texts.next_to(new_pie, RIGHT, buff=0.5)
+
+        for text in new_prob_texts:
+            self.play(Write(text), run_time=0.5)
+
+        self.wait(1)
+
+        pie_position = pie.get_center()
+
+        self.play(FadeOut(pie), FadeOut(new_pie))
+        self.wait(0.5)
+
+        self.play(prob_texts.animate.move_to(pie_position))
+        self.play(new_prob_texts.animate.next_to(prob_texts, RIGHT))
+        self.wait(1)
+
+        #Replace hyperparameters
+        self.play(Transform(equation[11], MathTex(r"0.95,\; 1.05").scale(0.5).move_to(equation[11])))
+        self.play(Transform(equation[14], MathTex(r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})").scale(0.5).move_to(equation[14])))
+        self.wait(1)
+
+        #Substitutions
+        self.play(reward_group.animate.next_to(old_policy_group, DOWN), copy_sample_group.animate.next_to(new_prob_texts, DOWN*1.5))
+
+        #o1 Substitution
+        copy_min_1 = equation[8:15].copy()
+        self.play(copy_min_1.animate.move_to(ORIGIN + RIGHT*2.5))
+        
+        self.play(Transform(copy_min_1, MathTex(
+            r"\min \left(\frac{\pi_\theta(o_1 \mid q)}{\pi_{\theta_{\text{old}}}(o_1 \mid q)} A_1,",
+            r"\text{clip} \left(",
+            r"\frac{\pi_\theta(o_1 \mid q)}{\pi_{\theta_{\text{old}}}(o_1 \mid q)},",
+            r"0.95,\; 1.05",
+            r"\right) A_1",
+            r"\right)",
+            r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
+        ).scale(0.5).move_to(ORIGIN + RIGHT*2.5)))
+        self.wait(1.5)
+
+        self.play(Transform(copy_min_1, MathTex(
+            r"\min \left(\frac{\pi_\theta(\text{Yellow})}{\pi_{\theta_{\text{old}}}(\text{Yellow})} A_1,",
+            r"\text{clip} \left(",
+            r"\frac{\pi_\theta(\text{Yellow})}{\pi_{\theta_{\text{old}}}(\text{Yellow})},",
+            r"0.95,\; 1.05",
+            r"\right) A_1",
+            r"\right)",
+            r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
+        ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+        self.wait(1.5)
+        self.play(Transform(copy_min_1, MathTex(
+            r"\min \left(\frac{0.45}{0.40} A_1,",
+            r"\text{clip} \left(",
+            r"\frac{0.45}{0.40},",
+            r"0.95,\; 1.05",
+            r"\right) A_1",
+            r"\right)",
+            r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
+        ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+        self.wait(1.5)
+        self.play(Transform(copy_min_1, MathTex(
+            r"\min \left(1.125 A_1,",
+            r"\text{clip} \left(",
+            r"1.125,\;",
+            r"0.95,\; 1.05",
+            r"\right) A_1",
+            r"\right)",
+            r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
+        ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+        self.wait(1.5)
+        self.play(Transform(copy_min_1, MathTex(
+            r"\min \left(1.125 A_1,\; 1.05 A_1\right)",
+            r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
+        ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+        
+        a1_text = MathTex(
+            r"A_1 = \frac{r_1 - \text{mean}\left(\{r_1, r_2, r_3\}\right)}{\text{std}\left(\{r_1, r_2, r_3\}\right)}"
+        )
+        self.play(Write(a1_text.next_to(copy_min_1, DOWN).scale(0.5)))
+        self.wait(1.5)
+        self.play(Transform(a1_text, MathTex(
+            r"A_1 = \frac{1 - \text{mean}\left(\{1, 1, 0.3\}\right)}{\text{std}\left(\{1, 1, 0.3\}\right)}"
+        ).next_to(copy_min_1, DOWN).scale(0.5)))
+        self.wait(1.5)
+        self.play(Transform(a1_text, MathTex(
+            r"A_1 \approx \frac{1-0.76667}{0.32998}"
+        ).next_to(copy_min_1, DOWN).scale(0.5)))
+        self.wait(1.5)
+        self.play(Transform(a1_text, MathTex(
+            r"A_1 \approx \frac{0.23333}{0.32998}"
+        ).next_to(copy_min_1, DOWN).scale(0.5)))
+        self.wait(1.5)
+        self.play(Transform(a1_text, MathTex(
+            r"A_1 \approx 0.70711"
+        ).next_to(copy_min_1, DOWN).scale(0.5)))
+
+        self.wait(1.5)
+        self.play(Transform(copy_min_1, MathTex(
+            r"\min \left(1.125 \times 0.70711,1.05 \times 0.70711\right)",
+            r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
+        ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+        self.play(FadeOut(a1_text))
+        self.wait(1.5)
+        self.play(Transform(copy_min_1, MathTex(
+            r"\min \left(0.795499,0.742466\right)",
+            r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
+        ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+        self.wait(1.5)
+        self.play(Transform(copy_min_1, MathTex(
+            r"0.742466",
+            r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
+        ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+
+        dkl_1_text = MathTex(
+            r"D_{KL}(\pi_\theta \parallel \pi_{\text{ref}}) = \frac{\pi_{\text{ref}}(o_1 \mid q)}{\pi_\theta(o_1 \mid q)} - \log\left(\frac{\pi_{\text{ref}}(o_1 \mid q)}{\pi_\theta(o_1 \mid q)}\right) - 1"
+        )
+        self.play(Write(dkl_1_text.next_to(copy_min_1, DOWN).scale(0.5)))
+        self.wait(1.5)
+        self.play(Transform(dkl_1_text, MathTex(
+            r"D_{KL}\left(\pi_\theta \parallel \pi_{\theta_{\text{old}}}\right) = \frac{\pi_{\theta_{\text{old}}}(\text{Yellow})}{\pi_\theta(\text{Yellow})} - \log\left(\frac{\pi_{\theta_{\text{old}}}(\text{Yellow})}{\pi_\theta(\text{Yellow})}\right) - 1"
+        ).next_to(copy_min_1, DOWN).scale(0.5)))
+        self.wait(1.5)
+        self.play(Transform(dkl_1_text, MathTex(
+            r"D_{KL}(\pi_\theta \parallel \pi_{\theta_{\text{old}}}) = \frac{0.40}{0.45} - \log\left(\frac{0.40}{0.45}\right) - 1"
+        ).next_to(copy_min_1, DOWN).scale(0.5)))
+        self.wait(1.5)
+        self.play(Transform(dkl_1_text, MathTex(
+            r"D_{KL}(\pi_\theta \parallel \pi_{\theta_{\text{old}}}) \approx 0.8889 - \log\left(0.8889\right) - 1"
+        ).next_to(copy_min_1, DOWN).scale(0.5)))
+        self.wait(1.5)
+        self.play(Transform(dkl_1_text, MathTex(
+            r"D_{KL}(\pi_\theta \parallel \pi_{\theta_{\text{old}}}) \approx 0.00667"
+        ).next_to(copy_min_1, DOWN).scale(0.5)))
+        self.wait(1.5)
+
+        self.play(Transform(copy_min_1, MathTex(
+            r"0.742466",
+            r"- 0.1 \times 0.00667",
+        ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+        self.play(FadeOut(dkl_1_text))
+        self.wait(0.5)
+        self.play(Transform(copy_min_1, MathTex(
+            r"0.741799"
+        ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+        self.wait(0.5)
+        self.play(Transform(copy_min_1, MathTex(
+            r"i=1:\;0.741799"
+        ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+        self.play(copy_min_1.animate.shift(LEFT + DOWN*3))
+        self.wait(0.5)
+
+        #o2 Substitution
+        copy_min_2 = equation[8:15].copy()
+        self.play(copy_min_2.animate.move_to(ORIGIN + RIGHT*2.5))
+
+        self.play(Transform(copy_min_2, MathTex(
+            r"\min \left(\frac{\pi_\theta(o_2 \mid q)}{\pi_{\theta_{\text{old}}}(o_2 \mid q)} A_2,",
+            r"\text{clip} \left(",
+            r"\frac{\pi_\theta(o_2 \mid q)}{\pi_{\theta_{\text{old}}}(o_2 \mid q)},",
+            r"0.95,\; 1.05",
+            r"\right) A_2",
+            r"\right)",
+            r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
+        ).scale(0.5).move_to(ORIGIN + RIGHT*2.5)))
+        self.wait(1.5)
+
+        self.play(Transform(copy_min_2, MathTex(
+            r"\min \left(\frac{\pi_\theta(\text{Yellow})}{\pi_{\theta_{\text{old}}}(\text{Yellow})} A_2,",
+            r"\text{clip} \left(",
+            r"\frac{\pi_\theta(\text{Yellow})}{\pi_{\theta_{\text{old}}}(\text{Yellow})},",
+            r"0.95,\; 1.05",
+            r"\right) A_2",
+            r"\right)",
+            r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
+        ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+        self.wait(1.5)
+        self.play(Transform(copy_min_2, MathTex(
+            r"0.741799"
+        ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+        self.wait(0.5)
+        self.play(Transform(copy_min_2, MathTex(
+            r"i=2:\;0.741799"
+        ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+        self.play(copy_min_2.animate.next_to(copy_min_1, RIGHT))
+        self.wait(0.5)
+
+        #o3 Substitution
+        copy_min_3 = equation[8:15].copy()
+        self.play(copy_min_3.animate.move_to(ORIGIN + RIGHT*2.5))
+        
+        self.play(Transform(copy_min_3, MathTex(
+            r"\min \left(\frac{\pi_\theta(o_3 \mid q)}{\pi_{\theta_{\text{old}}}(o_3 \mid q)} A_3,",
+            r"\text{clip} \left(",
+            r"\frac{\pi_\theta(o_3 \mid q)}{\pi_{\theta_{\text{old}}}(o_3 \mid q)},",
+            r"0.95,\; 1.05",
+            r"\right) A_3",
+            r"\right)",
+            r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
+        ).scale(0.5).move_to(ORIGIN + RIGHT*2.5)))
+        self.wait(1.5)
+
+        self.play(Transform(copy_min_3, MathTex(
+            r"\min \left(\frac{\pi_\theta(\text{Green})}{\pi_{\theta_{\text{old}}}(\text{Green})} A_3,",
+            r"\text{clip} \left(",
+            r"\frac{\pi_\theta(\text{Green})}{\pi_{\theta_{\text{old}}}(\text{Green})},",
+            r"0.95,\; 1.05",
+            r"\right) A_3",
+            r"\right)",
+            r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
+        ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+        self.wait(1.5)
+        self.play(Transform(copy_min_3, MathTex(
+            r"\min \left(\frac{0.28}{0.30} A_3,",
+            r"\text{clip} \left(",
+            r"\frac{0.28}{0.30},",
+            r"0.95,\; 1.05",
+            r"\right) A_3",
+            r"\right)",
+            r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
+        ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+        self.wait(1.5)
+        # self.play(Transform(copy_min_3, MathTex(
+        #     r"\min \left(0.9333 A_3,",
+        #     r"\text{clip} \left(",
+        #     r"0.9333,\;",
+        #     r"0.95,\; 1.05",
+        #     r"\right) A_3",
+        #     r"\right)",
+        #     r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
+        # ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+        # self.wait(1.5)
+        # self.play(Transform(copy_min_3, MathTex(
+        #     r"\min \left(0.9333 A_3,\; 0.9500 A_3\right)",
+        #     r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
+        # ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+        
+        # a3_text = MathTex(
+        #     r"A_3 = \frac{r_3 - \text{mean}\left(\{r_1, r_2, r_3\}\right)}{\text{std}\left(\{r_1, r_2, r_3\}\right)}"
+        # )
+        # self.play(Write(a3_text.next_to(copy_min_3, DOWN).scale(0.5)))
+        # self.wait(1.5)
+        # self.play(Transform(a3_text, MathTex(
+        #     r"A_3 = \frac{0.3 - \text{mean}\left(\{1, 1, 0.3\}\right)}{\text{std}\left(\{1, 1, 0.3\}\right)}"
+        # ).next_to(copy_min_3, DOWN).scale(0.5)))
+        # self.wait(1.5)
+        # self.play(Transform(a3_text, MathTex(
+        #     r"A_3 \approx \frac{0.3-0.76667}{0.32998}"
+        # ).next_to(copy_min_3, DOWN).scale(0.5)))
+        # self.wait(1.5)
+        # self.play(Transform(a3_text, MathTex(
+        #     r"A_3 \approx \frac{-0.46667}{0.32998}"
+        # ).next_to(copy_min_3, DOWN).scale(0.5)))
+        # self.wait(1.5)
+        # self.play(Transform(a3_text, MathTex(
+        #     r"A_3 \approx -1.41424"
+        # ).next_to(copy_min_3, DOWN).scale(0.5)))
+
+        # self.wait(1.5)
+        # self.play(Transform(copy_min_3, MathTex(
+        #     r"\min \left(0.9333 \times -1.41424,0.9500 \times -1.41424\right)",
+        #     r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
+        # ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+        # self.play(FadeOut(a3_text))
+        # self.wait(1.5)
+        # self.play(Transform(copy_min_3, MathTex(
+        #     r"\min \left(-1.319910,-1.343528\right)",
+        #     r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
+        # ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+        # self.wait(1.5)
+        # self.play(Transform(copy_min_3, MathTex(
+        #     r"-1.343528",
+        #     r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
+        # ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+        # self.wait(1.5)
+
+        # dkl_3_text = MathTex(
+        #     r"D_{KL}(\pi_\theta \parallel \pi_{\text{ref}}) = \frac{\pi_{\text{ref}}(o_3 \mid q)}{\pi_\theta(o_3 \mid q)} - \log\left(\frac{\pi_{\text{ref}}(o_3 \mid q)}{\pi_\theta(o_3 \mid q)}\right) - 1"
+        # )
+        # self.play(Write(dkl_3_text.next_to(copy_min_3, DOWN).scale(0.5)))
+        # self.wait(1.5)
+        # self.play(Transform(dkl_3_text, MathTex(
+        #     r"D_{KL}\left(\pi_\theta \parallel \pi_{\theta_{\text{old}}}\right) = \frac{\pi_{\theta_{\text{old}}}(\text{Green})}{\pi_\theta(\text{Green})} - \log\left(\frac{\pi_{\theta_{\text{old}}}(\text{Green})}{\pi_\theta(\text{Green})}\right) - 1"
+        # ).next_to(copy_min_3, DOWN).scale(0.5)))
+        # self.wait(1.5)
+        # self.play(Transform(dkl_3_text, MathTex(
+        #     r"D_{KL}(\pi_\theta \parallel \pi_{\theta_{\text{old}}}) = \frac{0.28}{0.30} - \log\left(\frac{0.28}{0.30}\right) - 1"
+        # ).next_to(copy_min_3, DOWN).scale(0.5)))
+        # self.wait(1.5)
+        # self.play(Transform(dkl_3_text, MathTex(
+        #     r"D_{KL}(\pi_\theta \parallel \pi_{\theta_{\text{old}}}) \approx 0.9333 - \log\left(0.9333\right) - 1"
+        # ).next_to(copy_min_3, DOWN).scale(0.5)))
+        # self.wait(1.5)
+        # self.play(Transform(dkl_3_text, MathTex(
+        #     r"D_{KL}(\pi_\theta \parallel \pi_{\theta_{\text{old}}}) \approx 0.00233"
+        # ).next_to(copy_min_3, DOWN).scale(0.5)))
+        # self.wait(1.5)
+
+        # self.play(Transform(copy_min_3, MathTex(
+        #     r"-1.343528",
+        #     r"- 0.1 \times 0.00233",
+        # ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+        # self.play(FadeOut(dkl_3_text))
+        # self.wait(0.5)
+        self.play(Transform(copy_min_3, MathTex(
+            r"-1.343761"
+        ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+        self.wait(0.5)
+        self.play(Transform(copy_min_3, MathTex(
+            r"i=3:\;-1.343761"
+        ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
+        self.play(copy_min_3.animate.next_to(copy_min_1, DOWN))
+        self.wait(1.5)
+
+        #Substitution into main equation
+        self.play(Transform(equation, MathTex(
+            r"J_{\text{GRPO}}(\theta) = ",
+            r"\mathbb{E}_{",
+            r"q \sim P(Q)",             # index 2
+            r",\; ",                    # index 3
+            r"\{o_i\}_{i=1}^3",         # index 4
+            r"\sim \pi_{\theta_{\text{old}}}(O \mid q)}",  # index 5
+            r"\left[",
+            r"\frac{1}{3} \left((0.741799)+(0.741799)+(-1.343761)\right)",
+            r"\right]"
+        ).scale(0.5).shift(UP*1.5)))
+        self.wait(1.5)
+        self.play(Transform(equation, MathTex(
+            r"J_{\text{GRPO}}(\theta) = ",
+            r"\mathbb{E}_{",
+            r"q \sim P(Q)",             # index 2
+            r",\; ",                    # index 3
+            r"\{o_i\}_{i=1}^3",         # index 4
+            r"\sim \pi_{\theta_{\text{old}}}(O \mid q)}",  # index 5
+            r"\left[",
+            r"\frac{1}{3} \left(0.139837\right)",
+            r"\right]"
+        ).scale(0.5).shift(UP*1.5)))
+        self.wait(0.5)
+        self.play(Transform(equation, MathTex(
+            r"J_{\text{GRPO}}(\theta) = ",
+            r"\mathbb{E}_{",
+            r"q \sim P(Q)",             # index 2
+            r",\; ",                    # index 3
+            r"\{o_i\}_{i=1}^3",         # index 4
+            r"\sim \pi_{\theta_{\text{old}}}(O \mid q)}",  # index 5
+            r"\left[",
+            r"0.0466123",
+            r"\right]"
+        ).scale(0.5).shift(UP*1.5)))
+        self.wait(0.5)
+        self.play(Transform(equation, MathTex(
+            r"J_{\text{GRPO}}(\theta) = 0.0466123").shift(UP*1.5))
+        )
+        self.wait(1)
+        self.play(*[FadeOut(mobj) for mobj in self.mobjects if mobj != equation])
+        self.play(Transform(equation.animate.shift(DOWN*1.5)))
+        self.wait(1.5)
