@@ -177,13 +177,6 @@ class GridworldConceptsDemo(Scene):
                 self.play(Write(score_text))
                 self.play(FadeOut(score_text))
         
-        # self.camera.frame.save_state()
-        # self.play(self.camera.frame.animate.shift(RIGHT * 3))
-        
-        # text_on_right = Text("Reward", font_size=36).shift(RIGHT * 4)  # Position it on the right side
-        # self.play(Write(text_on_right))
-
-        # self.play(Restore(self.camera.frame))
 
 class GridworldPolicyDemo(Scene):
     def construct(self):
@@ -266,7 +259,7 @@ class GridWorldMDP(Scene):
 
         def get_mini_grid(position):
             grid_size = 5
-            square_size = 0.3  # smaller so it can be used as a mini visual
+            square_size = 0.3
             grid_group = VGroup()
 
             def grid_to_pos(x, y):
@@ -581,18 +574,18 @@ class GRPOScene3(Scene):
         self.wait(6)
 
         min_expr = VGroup(
-        equation[4],  # \min \left(
-        equation[5],  # \frac{\pi_\theta(o_i \mid q)}{
-        equation[6],  # \pi_{\theta_{\text{old}}}
-        equation[7],  # (
-        equation[8],  # o_i
-        equation[9],  # \mid
-        equation[10], # q
-        equation[11], # ) A_i
-        equation[12], # ,\text{clip} \left(
-        equation[13], # \frac{\pi_\theta(o_i \mid q)}{\pi_{\theta_{\text{old}}}(o_i \mid q)},
-        equation[14], # 1 - \epsilon, 1 + \epsilon
-        equation[15], # \right) A_i
+        equation[4],  
+        equation[5],  
+        equation[6],  
+        equation[7],  
+        equation[8],  
+        equation[9],  
+        equation[10], 
+        equation[11], 
+        equation[12], 
+        equation[13],
+        equation[14], 
+        equation[15],
         )   
 
         self.play(Indicate(min_expr, color=YELLOW))
@@ -904,10 +897,10 @@ class GRPOExample(Scene):
         equation = MathTex(
             r"J_{\text{GRPO}}(\theta) = ",
             r"\mathbb{E}_{",
-            r"q \sim P(Q)",             # index 2
-            r",\; ",                    # index 3
-            r"\{o_i\}_{i=1}^G",         # index 4
-            r"\sim \pi_{\theta_{\text{old}}}(O \mid q)}",  # index 5
+            r"q \sim P(Q)",             
+            r",\; ",                    
+            r"\{o_i\}_{i=1}^G",         
+            r"\sim \pi_{\theta_{\text{old}}}(O \mid q)}", 
             r"\left[",
             r"\frac{1}{G} \sum_{i=1}^G \min \left(",
             r"\frac{\pi_\theta(o_i \mid q)}{\pi_{\theta_{\text{old}}}(o_i \mid q)} A_i,",
@@ -952,11 +945,10 @@ class GRPOExample(Scene):
                     stroke_width=1
                 )
 
-                # Label placement inside the sector
                 mid_angle = start_angle + angle / 2
                 label_pos = radius * 0.5 * np.array([np.cos(mid_angle), np.sin(mid_angle), 0])
                 txt = Text(str(prob), font_size=24, color=WHITE).move_to(label_pos)
-                sector.add(txt)  # Add label directly onto the sector
+                sector.add(txt) 
 
                 sectors.add(sector)
                 start_angle += angle
@@ -968,7 +960,7 @@ class GRPOExample(Scene):
         self.wait(1)
         self.play(pie.animate.shift(LEFT))
         self.wait(1)
-        prob_texts = VGroup()  # Group for all probability texts
+        prob_texts = VGroup()
         for i, (prob, colour) in enumerate(zip(probs, colours)):
             prob_text = MathTex(
                 rf"\pi_{{\theta_{{\text{{old}}}}}}(\text{{{colour}}}) = {prob:.2f}",
@@ -989,10 +981,9 @@ class GRPOExample(Scene):
         #Rewards
         rewards = [1, 0.3, 0.1, -0.5]
         colours = ["Yellow", "Green", "Brown", "Black"]
-        reward_texts = VGroup()  # Group for all reward texts
+        reward_texts = VGroup()  
 
         for reward, colour in zip(rewards, colours):
-            # Pad positive rewards with \phantom{-} so = signs align
             reward_str = f"{reward}" if reward < 0 else f"\\phantom{{-}}{reward}"
             text = MathTex(
                 rf"r(\text{{{colour}}}) = {reward_str}",
@@ -1013,10 +1004,10 @@ class GRPOExample(Scene):
         self.play(Transform(equation, MathTex(
             r"J_{\text{GRPO}}(\theta) = ",
             r"\mathbb{E}_{",
-            r"q \sim P(Q)",             # index 2
-            r",\; ",                    # index 3
-            r"\{o_i\}_{i=1}^3",         # index 4
-            r"\sim \pi_{\theta_{\text{old}}}(O \mid q)}",  # index 5
+            r"q \sim P(Q)",             
+            r",\; ",                    
+            r"\{o_i\}_{i=1}^3",         
+            r"\sim \pi_{\theta_{\text{old}}}(O \mid q)}",  
             r"\left[",
             r"\frac{1}{3} \sum_{i=1}^3 ",
             r"\min \left(\frac{\pi_\theta(o_i \mid q)}{\pi_{\theta_{\text{old}}}(o_i \mid q)} A_i,",
@@ -1061,7 +1052,7 @@ class GRPOExample(Scene):
         self.wait(1)
         self.play(new_pie.animate.shift(LEFT*0.5))
         self.wait(1)
-        new_prob_texts = VGroup()  # Group for all probability texts
+        new_prob_texts = VGroup()  
         for i, (prob, colour) in enumerate(zip(new_probs, colours)):
             prob_text = MathTex(
                 rf"\pi_{{\theta}}(\text{{{colour}}}) = {prob:.2f}",
@@ -1289,88 +1280,7 @@ class GRPOExample(Scene):
             r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
         ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
         self.wait(1.5)
-        # self.play(Transform(copy_min_3, MathTex(
-        #     r"\min \left(0.9333 A_3,",
-        #     r"\text{clip} \left(",
-        #     r"0.9333,\;",
-        #     r"0.95,\; 1.05",
-        #     r"\right) A_3",
-        #     r"\right)",
-        #     r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
-        # ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
-        # self.wait(1.5)
-        # self.play(Transform(copy_min_3, MathTex(
-        #     r"\min \left(0.9333 A_3,\; 0.9500 A_3\right)",
-        #     r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
-        # ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
-        
-        # a3_text = MathTex(
-        #     r"A_3 = \frac{r_3 - \text{mean}\left(\{r_1, r_2, r_3\}\right)}{\text{std}\left(\{r_1, r_2, r_3\}\right)}"
-        # )
-        # self.play(Write(a3_text.next_to(copy_min_3, DOWN).scale(0.5)))
-        # self.wait(1.5)
-        # self.play(Transform(a3_text, MathTex(
-        #     r"A_3 = \frac{0.3 - \text{mean}\left(\{1, 1, 0.3\}\right)}{\text{std}\left(\{1, 1, 0.3\}\right)}"
-        # ).next_to(copy_min_3, DOWN).scale(0.5)))
-        # self.wait(1.5)
-        # self.play(Transform(a3_text, MathTex(
-        #     r"A_3 \approx \frac{0.3-0.76667}{0.32998}"
-        # ).next_to(copy_min_3, DOWN).scale(0.5)))
-        # self.wait(1.5)
-        # self.play(Transform(a3_text, MathTex(
-        #     r"A_3 \approx \frac{-0.46667}{0.32998}"
-        # ).next_to(copy_min_3, DOWN).scale(0.5)))
-        # self.wait(1.5)
-        # self.play(Transform(a3_text, MathTex(
-        #     r"A_3 \approx -1.41424"
-        # ).next_to(copy_min_3, DOWN).scale(0.5)))
 
-        # self.wait(1.5)
-        # self.play(Transform(copy_min_3, MathTex(
-        #     r"\min \left(0.9333 \times -1.41424,0.9500 \times -1.41424\right)",
-        #     r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
-        # ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
-        # self.play(FadeOut(a3_text))
-        # self.wait(1.5)
-        # self.play(Transform(copy_min_3, MathTex(
-        #     r"\min \left(-1.319910,-1.343528\right)",
-        #     r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
-        # ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
-        # self.wait(1.5)
-        # self.play(Transform(copy_min_3, MathTex(
-        #     r"-1.343528",
-        #     r"- 0.1 D_{KL}(\pi_\theta \parallel \pi_{\text{ref}})",
-        # ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
-        # self.wait(1.5)
-
-        # dkl_3_text = MathTex(
-        #     r"D_{KL}(\pi_\theta \parallel \pi_{\text{ref}}) = \frac{\pi_{\text{ref}}(o_3 \mid q)}{\pi_\theta(o_3 \mid q)} - \log\left(\frac{\pi_{\text{ref}}(o_3 \mid q)}{\pi_\theta(o_3 \mid q)}\right) - 1"
-        # )
-        # self.play(Write(dkl_3_text.next_to(copy_min_3, DOWN).scale(0.5)))
-        # self.wait(1.5)
-        # self.play(Transform(dkl_3_text, MathTex(
-        #     r"D_{KL}\left(\pi_\theta \parallel \pi_{\theta_{\text{old}}}\right) = \frac{\pi_{\theta_{\text{old}}}(\text{Green})}{\pi_\theta(\text{Green})} - \log\left(\frac{\pi_{\theta_{\text{old}}}(\text{Green})}{\pi_\theta(\text{Green})}\right) - 1"
-        # ).next_to(copy_min_3, DOWN).scale(0.5)))
-        # self.wait(1.5)
-        # self.play(Transform(dkl_3_text, MathTex(
-        #     r"D_{KL}(\pi_\theta \parallel \pi_{\theta_{\text{old}}}) = \frac{0.28}{0.30} - \log\left(\frac{0.28}{0.30}\right) - 1"
-        # ).next_to(copy_min_3, DOWN).scale(0.5)))
-        # self.wait(1.5)
-        # self.play(Transform(dkl_3_text, MathTex(
-        #     r"D_{KL}(\pi_\theta \parallel \pi_{\theta_{\text{old}}}) \approx 0.9333 - \log\left(0.9333\right) - 1"
-        # ).next_to(copy_min_3, DOWN).scale(0.5)))
-        # self.wait(1.5)
-        # self.play(Transform(dkl_3_text, MathTex(
-        #     r"D_{KL}(\pi_\theta \parallel \pi_{\theta_{\text{old}}}) \approx 0.00233"
-        # ).next_to(copy_min_3, DOWN).scale(0.5)))
-        # self.wait(1.5)
-
-        # self.play(Transform(copy_min_3, MathTex(
-        #     r"-1.343528",
-        #     r"- 0.1 \times 0.00233",
-        # ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
-        # self.play(FadeOut(dkl_3_text))
-        # self.wait(0.5)
         self.play(Transform(copy_min_3, MathTex(
             r"-1.343761"
         ).move_to(ORIGIN + RIGHT*2.5).scale(0.5)))
@@ -1385,10 +1295,10 @@ class GRPOExample(Scene):
         self.play(Transform(equation, MathTex(
             r"J_{\text{GRPO}}(\theta) = ",
             r"\mathbb{E}_{",
-            r"q \sim P(Q)",             # index 2
-            r",\; ",                    # index 3
-            r"\{o_i\}_{i=1}^3",         # index 4
-            r"\sim \pi_{\theta_{\text{old}}}(O \mid q)}",  # index 5
+            r"q \sim P(Q)",             
+            r",\; ",                    
+            r"\{o_i\}_{i=1}^3",         
+            r"\sim \pi_{\theta_{\text{old}}}(O \mid q)}",  
             r"\left[",
             r"\frac{1}{3} \left((0.741799)+(0.741799)+(-1.343761)\right)",
             r"\right]"
@@ -1397,10 +1307,10 @@ class GRPOExample(Scene):
         self.play(Transform(equation, MathTex(
             r"J_{\text{GRPO}}(\theta) = ",
             r"\mathbb{E}_{",
-            r"q \sim P(Q)",             # index 2
-            r",\; ",                    # index 3
-            r"\{o_i\}_{i=1}^3",         # index 4
-            r"\sim \pi_{\theta_{\text{old}}}(O \mid q)}",  # index 5
+            r"q \sim P(Q)",             
+            r",\; ",                    
+            r"\{o_i\}_{i=1}^3",         
+            r"\sim \pi_{\theta_{\text{old}}}(O \mid q)}",  
             r"\left[",
             r"\frac{1}{3} \left(0.139837\right)",
             r"\right]"
@@ -1409,10 +1319,10 @@ class GRPOExample(Scene):
         self.play(Transform(equation, MathTex(
             r"J_{\text{GRPO}}(\theta) = ",
             r"\mathbb{E}_{",
-            r"q \sim P(Q)",             # index 2
-            r",\; ",                    # index 3
-            r"\{o_i\}_{i=1}^3",         # index 4
-            r"\sim \pi_{\theta_{\text{old}}}(O \mid q)}",  # index 5
+            r"q \sim P(Q)",             
+            r",\; ",                    
+            r"\{o_i\}_{i=1}^3",         
+            r"\sim \pi_{\theta_{\text{old}}}(O \mid q)}",  
             r"\left[",
             r"0.0466123",
             r"\right]"

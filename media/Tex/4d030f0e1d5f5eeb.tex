@@ -1,9 +1,0 @@
-\documentclass[preview]{standalone}
-\usepackage[english]{babel}
-\usepackage{amsmath}
-\usepackage{amssymb}
-\begin{document}
-\begin{align*}
-L(\theta) = \mathbb{E}_{q \sim P(Q), \{o_i\} \sim \pi_{\text{old}}} \left[ \frac{1}{G} \sum_{i=1}^G \min\left( \underbrace{\frac{\pi_{\text{new}}(o_i|q)}{\pi_{\text{old}}(o_i|q) A(q, o_i)}_{\text{Policy Ratio} \times \text{Advantage}}, \text{clip}\left(\frac{\pi_{\text{new}}}{\pi_{\text{old}}}}, 1-\epsilon, 1+\epsilon\right) A(q, o_i) \right) - \beta \, \text{KL}(\pi_{\text{new}} || \pi_{\text{ref}}) \right]
-\end{align*}
-\end{document}

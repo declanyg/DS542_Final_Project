@@ -1,5 +1,0 @@
-# This file is used internally by FFMPEG.
-file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/GridWorldQValues/1578262199_2772921585_734250340.mp4'
-file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/GridWorldQValues/1613263639_2508921053_642732426.mp4'
-file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/GridWorldQValues/1613263639_1121656678_4258449051.mp4'
-file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/GridWorldQValues/1613263639_1432596116_1125368956.mp4'

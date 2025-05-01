@@ -1,8 +1,0 @@
-# This file is used internally by FFMPEG.
-file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/GradientDescentGraph/1185818338_2380309767_223132457.mp4'
-file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/GradientDescentGraph/624642324_855429936_3106217117.mp4'
-file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/GradientDescentGraph/624642324_1989729629_3188345104.mp4'
-file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/GradientDescentGraph/624642324_2872842549_994755870.mp4'
-file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/GradientDescentGraph/624642324_4143342469_720280275.mp4'
-file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/GradientDescentGraph/624642324_3644383913_1150694132.mp4'
-file 'file:/Users/YoungDeclan/BostonU/DS542/final_project/final/media/videos/main/480p15/partial_movie_files/GradientDescentGraph/624642324_2834143258_3881981559.mp4'
